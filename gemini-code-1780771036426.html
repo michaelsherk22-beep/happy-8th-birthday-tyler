@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tyler's Birthday Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --radius-sm: 0.5rem;
+      --radius-md: 0.85rem;
+      --radius-lg: 1.2rem;
+      --radius-xl: 1.6rem;
+      --shadow: 0 12px 30px rgba(78, 48, 122, 0.18);
+      --font-display: 'Baloo 2', cursive;
+      --font-body: 'Nunito', sans-serif;
+      --bg1: #fff7d6;
+      --bg2: #ffe3f1;
+      --bg3: #dff8ff;
+      --surface: rgba(255,255,255,0.82);
+      --surface-strong: rgba(255,255,255,0.96);
+      --text: #4a2b63;
+      --muted: #74588e;
+      --pink: #ff5ea8;
+      --pink-dark: #df3b88;
+      --purple: #8757ff;
+      --blue: #43b8ff;
+      --green: #4ccf84;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #ffffff 0%, rgba(255,255,255,0.65) 24%, transparent 25%),
+        radial-gradient(circle at bottom right, #ffffff 0%, rgba(255,255,255,0.55) 18%, transparent 19%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+      overflow: hidden;
+    }
+    button { font: inherit; }
+    .app {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+    }
+    .screen {
+      width: min(1100px, 100%);
+      display: none;
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 2px solid rgba(255,255,255,0.65);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .screen.active { display: block; }
+    .menu {
+      padding: clamp(1.25rem, 2vw, 2rem);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    .hero-card, .menu-card, .hud, .overlay-card, .howto {
+      background: var(--surface-strong);
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(255,255,255,0.8);
+      box-shadow: 0 8px 24px rgba(137, 87, 255, 0.12);
+    }
+    .hero-card { padding: var(--space-8); }
+    .title {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      line-height: 0.95;
+      margin: 0 0 var(--space-4);
+      color: var(--purple);
+      text-shadow: 0 2px 0 rgba(255,255,255,0.75);
+    }
+    .subtitle {
+      font-size: var(--text-lg);
+      margin: 0 0 var(--space-4);
+      color: var(--text);
+      font-weight: 800;
+    }
+    .lead { font-size: var(--text-base); color: var(--muted); max-width: 46ch; }
+    .button-row, .menu-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+    }
+    .menu-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: var(--space-6); }
+    .menu-card {
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      min-height: 220px;
+      justify-content: space-between;
+    }
+    .emoji-badge {
+      width: 78px; height: 78px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 2.2rem;
+      background: linear-gradient(180deg, #fff, #ffe8f6);
+      border: 3px solid #fff;
+      box-shadow: 0 8px 18px rgba(255, 94, 168, 0.2);
+    }
+    .menu-card h2, .howto h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--purple);
+    }
+    .menu-card p, .howto p, .howto li { margin: 0; color: var(--muted); }
+    .btn {
+      border: none;
+      min-height: 48px;
+      padding: 0.8rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+      box-shadow: 0 8px 18px rgba(96, 66, 171, 0.18);
+    }
+    .btn:hover, .btn:focus-visible { transform: translateY(-2px) scale(1.01); }
+    .btn:active { transform: translateY(1px) scale(0.99); }
+    .btn-primary { background: linear-gradient(180deg, var(--pink), var(--pink-dark)); color: white; }
+    .btn-secondary { background: linear-gradient(180deg, #8f69ff, #7049ee); color: white; }
+    .btn-ghost { background: white; color: var(--purple); border: 2px solid rgba(135, 87, 255, 0.2); }
+
+    .hero-side {
+      padding: var(--space-6);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,243,255,0.95));
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(255,255,255,0.8);
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sparkles { position: absolute; inset: 0; pointer-events: none; }
+    .sparkles span {
+      position: absolute; font-size: 1.1rem; opacity: 0.9;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0px) rotate(0deg);} 50% { transform: translateY(-8px) rotate(8deg);} }
+    .tyler-portrait {
+      max-width: min(100%, 320px);
+      border-radius: 1.3rem;
+      border: 4px solid white;
+      box-shadow: 0 18px 28px rgba(76, 34, 112, 0.18);
+      object-fit: cover;
+    }
+
+    .game-shell { display: grid; grid-template-rows: auto 1fr; min-height: min(94vh, 860px); }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.88));
+      border-bottom: 2px solid rgba(255,255,255,0.85);
+    }
+    .brandline {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--purple);
+      margin: 0;
+    }
+    .toolbar { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .game-wrap {
+      position: relative;
+      padding: var(--space-4);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: var(--space-4);
+      min-height: 0;
+    }
+    .sidebar {
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    .hud, .howto { padding: var(--space-4); }
+    .hud h3, .howto h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      color: var(--purple);
+      margin: 0 0 var(--space-3);
+    }
+    .stat {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.75);
+      border-radius: var(--radius-md);
+      padding: 0.7rem 0.85rem;
+      margin-top: var(--space-2);
+      font-weight: 800;
+    }
+    .pill-items { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
+    .item-pill {
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      background: #fff;
+      border: 2px dashed rgba(135,87,255,0.25);
+      font-weight: 800;
+    }
+    .item-pill.done { background: #eafff1; color: #157d4d; border-style: solid; }
+    .canvas-wrap {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,240,255,0.95));
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      border: 2px solid rgba(255,255,255,0.8);
+      min-height: 0;
+    }
+    canvas {
+      width: 100%;
+      height: min(72vh, 720px);
+      display: block;
+      border-radius: calc(var(--radius-lg) - 0.5rem);
+      background: #f4f0ff;
+    }
+    .overlay {
+      position: absolute; inset: var(--space-3);
+      display: none; align-items: center; justify-content: center;
+      background: rgba(91, 56, 126, 0.22);
+      border-radius: calc(var(--radius-lg) - 0.5rem);
+      padding: var(--space-4);
+      text-align: center;
+    }
+    .overlay.show { display: flex; }
+    .overlay-card {
+      max-width: 540px;
+      padding: var(--space-8);
+      animation: pop 280ms ease;
+    }
+    @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .overlay-card h2 {
+      margin: 0 0 var(--space-3);
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      color: var(--pink);
+      line-height: 1;
+    }
+    .overlay-card p { margin: 0 0 var(--space-4); color: var(--muted); font-size: var(--text-base); }
+    .big-emoji { font-size: 3.4rem; margin-bottom: var(--space-3); }
+    .confetti {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; width: 12px; height: 18px; border-radius: 4px;
+      top: -24px; animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      to { transform: translateY(110vh) rotate(700deg); opacity: 0.95; }
+    }
+
+    @media (max-width: 920px) {
+      .hero, .game-wrap, .menu-grid { grid-template-columns: 1fr; }
+      .hero-side { min-height: 280px; }
+      canvas { height: min(56vh, 560px); }
+    }
+    @media (max-width: 640px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .toolbar { width: 100%; }
+      .toolbar .btn { flex: 1 1 140px; }
+      .hero-card, .menu-card, .hud, .howto, .overlay-card { padding: var(--space-4); }
+      .title { font-size: clamp(2.2rem, 8vw, 3.2rem); }
+      canvas { height: 52vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <main>
+      <section id="menuScreen" class="screen active menu" aria-label="Main menu">
+        <div class="hero">
+          <div class="hero-card">
+            <p class="subtitle">🎉 Happy 8th Birthday, Tyler! 🎉</p>
+            <h1 class="title">Tyler's Birthday<br>Adventure Arcade</h1>
+            <p class="lead">Pick a colorful birthday game and help Tyler sneak for snacks or blast soccer shots into the net. Both games are easy to play, bright, playful, and built for a fun celebration.</p>
+            <div class="menu-grid">
+              <article class="menu-card">
+                <div class="emoji-badge" aria-hidden="true">🕵️‍♀️</div>
+                <div>
+                  <h2>Midnight Snack Sneak</h2>
+                  <p>Collect the iPad, juice box, and cupcake, dodge sleepy parents, then tiptoe to bed to win.</p>
+                </div>
+                <button class="btn btn-primary" id="playSneakBtn">Play Sneak Game</button>
+              </article>
+              <article class="menu-card">
+                <div class="emoji-badge" aria-hidden="true">⚽</div>
+                <div>
+                  <h2>Birthday Striker</h2>
+                  <p>Aim the soccer ball, shoot past the goalie, and score 5 goals for a big birthday cheer.</p>
+                </div>
+                <button class="btn btn-secondary" id="playSoccerBtn">Play Soccer Game</button>
+              </article>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="sparkles" aria-hidden="true">
+              <span style="top:12%;left:10%;animation-delay:0s;">✨</span>
+              <span style="top:22%;right:14%;animation-delay:0.8s;">⭐</span>
+              <span style="bottom:18%;left:12%;animation-delay:1.3s;">💖</span>
+              <span style="bottom:10%;right:10%;animation-delay:2s;">🎈</span>
+              <span style="top:48%;left:8%;animation-delay:2.8s;">⚽</span>
+            </div>
+            <img class="tyler-portrait" src="generated-image (7).png" alt="Birthday-themed portrait art for Tyler" />
+          </div>
+        </div>
+      </section>
+
+      <section id="sneakScreen" class="screen" aria-label="Tyler's Midnight Snack Sneak game">
+        <div class="game-shell">
+          <div class="topbar">
+            <h1 class="brandline">🕵️‍♀️ Tyler's Midnight Snack Sneak</h1>
+            <div class="toolbar">
+              <button class="btn btn-ghost" id="sneakResetTop">Restart</button>
+              <button class="btn btn-ghost" id="sneakMenuTop">Main Menu</button>
+            </div>
+          </div>
+          <div class="game-wrap">
+            <aside class="sidebar">
+              <section class="hud">
+                <h3>Mission</h3>
+                <div class="stat"><span>Collected</span><strong id="sneakCollected">0 / 3</strong></div>
+                <div class="stat"><span>Status</span><strong id="sneakStatus">Sneaky...</strong></div>
+                <div class="pill-items">
+                  <span class="item-pill" id="pill-ipad">📱 iPad</span>
+                  <span class="item-pill" id="pill-juice">🧃 Juice Box</span>
+                  <span class="item-pill" id="pill-cupcake">🧁 Cupcake</span>
+                </div>
+              </section>
+              <section class="howto">
+                <h3>How to Play</h3>
+                <p>Use Arrow Keys or WASD to move Tyler. Stay out of the yellow parent vision cones, grab all 3 goodies, then reach the bed safe zone.</p>
+                <div class="button-row">
+                  <button class="btn btn-primary" id="sneakRestartBtn">Restart Level</button>
+                </div>
+              </section>
+            </aside>
+            <div class="canvas-wrap">
+              <canvas id="sneakCanvas" width="900" height="620" aria-label="Sneak game canvas"></canvas>
+              <div class="overlay" id="sneakOverlay" aria-live="polite">
+                <div class="overlay-card">
+                  <div class="big-emoji" id="sneakOverlayEmoji">😴</div>
+                  <h2 id="sneakOverlayTitle">Busted!</h2>
+                  <p id="sneakOverlayText">Back to bed!</p>
+                  <div class="button-row" style="justify-content:center;">
+                    <button class="btn btn-primary" id="sneakOverlayRestart">Try Again</button>
+                    <button class="btn btn-ghost" id="sneakOverlayMenu">Main Menu</button>
+                  </div>
+                </div>
+                <div class="confetti" id="sneakConfetti"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="soccerScreen" class="screen" aria-label="Tyler's Birthday Striker game">
+        <div class="game-shell">
+          <div class="topbar">
+            <h1 class="brandline">⚽ Tyler's Birthday Striker</h1>
+            <div class="toolbar">
+              <button class="btn btn-ghost" id="soccerResetTop">Restart</button>
+              <button class="btn btn-ghost" id="soccerMenuTop">Main Menu</button>
+            </div>
+          </div>
+          <div class="game-wrap">
+            <aside class="sidebar">
+              <section class="hud">
+                <h3>Scoreboard</h3>
+                <div class="stat"><span>Goals</span><strong id="soccerGoals">0 / 5</strong></div>
+                <div class="stat"><span>Shots</span><strong id="soccerShots">0</strong></div>
+                <div class="stat"><span>Status</span><strong id="soccerStatus">Line up your shot!</strong></div>
+              </section>
+              <section class="howto">
+                <h3>How to Play</h3>
+                <p>Move with Left/Right arrows, A/D, or your mouse. Press Space or click to shoot. Score 5 goals past the moving goalie to win.</p>
+                <div class="button-row">
+                  <button class="btn btn-secondary" id="soccerRestartBtn">Restart Match</button>
+                </div>
+              </section>
+            </aside>
+            <div class="canvas-wrap">
+              <canvas id="soccerCanvas" width="900" height="620" aria-label="Soccer game canvas"></canvas>
+              <div class="overlay" id="soccerOverlay" aria-live="polite">
+                <div class="overlay-card">
+                  <div class="big-emoji" id="soccerOverlayEmoji">⚽</div>
+                  <h2 id="soccerOverlayTitle">Goal Time!</h2>
+                  <p id="soccerOverlayText">Ready for another shot?</p>
+                  <div class="button-row" style="justify-content:center;">
+                    <button class="btn btn-secondary" id="soccerOverlayRestart">Play Again</button>
+                    <button class="btn btn-ghost" id="soccerOverlayMenu">Main Menu</button>
+                  </div>
+                </div>
+                <div class="confetti" id="soccerConfetti"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Preload Tyler's Image
+    const tylerImg = new Image();
+    tylerImg.src = 'generated-image (7).png';
+
+    const screens = {
+      menu: document.getElementById('menuScreen'),
+      sneak: document.getElementById('sneakScreen'),
+      soccer: document.getElementById('soccerScreen')
+    };
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.remove('active'));
+      screens[name].classList.add('active');
+      if (name === 'sneak') sneakGame.start(); else sneakGame.stop();
+      if (name === 'soccer') soccerGame.start(); else soccerGame.stop();
+    }
+
+    document.getElementById('playSneakBtn').addEventListener('click', () => showScreen('sneak'));
+    document.getElementById('playSoccerBtn').addEventListener('click', () => showScreen('soccer'));
+
+    const keys = new Set();
+    window.addEventListener('keydown', (e) => {
+      const lower = e.key.toLowerCase();
+      if (["arrowup","arrowdown","arrowleft","arrowright"," ","w","a","s","d"].includes(lower) || e.key === ' ') {
+        e.preventDefault();
+      }
+      keys.add(lower === ' ' ? 'space' : lower);
+      if (screens.soccer.classList.contains('active') && (lower === ' ' || e.key === ' ')) soccerGame.shoot();
+    });
+    window.addEventListener('keyup', (e) => {
+      const lower = e.key.toLowerCase();
+      keys.delete(lower === ' ' ? 'space' : lower);
+    });
+
+    function rectsOverlap(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function pointInTri(px, py, ax, ay, bx, by, cx, cy) {
+      const v0x = cx - ax, v0y = cy - ay;
+      const v1x = bx - ax, v1y = by - ay;
+      const v2x = px - ax, v2y = py - ay;
+      const dot00 = v0x * v0x + v0y * v0y;
+      const dot01 = v0x * v1x + v0y * v1y;
+      const dot02 = v0x * v2x + v0y * v2y;
+      const dot11 = v1x * v1x + v1y * v1y;
+      const dot12 = v1x * v2x + v1y * v2y;
+      const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+      const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+      const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+      return u >= 0 && v >= 0 && u + v <= 1;
+    }
+
+    function spawnConfetti(container, count = 80) {
+      container.innerHTML = '';
+      const colors = ['#ff5ea8', '#8757ff', '#43b8ff', '#4ccf84', '#f7c948', '#ff8a5b'];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDuration = (2.7 + Math.random() * 2.3) + 's';
+        piece.style.animationDelay = (Math.random() * 0.6) + 's';
+        piece.style.transform = `translateY(0) rotate(${Math.random() * 180}deg)`;
+        container.appendChild(piece);
+      }
+    }
+
+    const sneakCanvas = document.getElementById('sneakCanvas');
+    const sctx = sneakCanvas.getContext('2d');
+    const sneakOverlay = document.getElementById('sneakOverlay');
+    const sneakStatus = document.getElementById('sneakStatus');
+    const sneakCollected = document.getElementById('sneakCollected');
+
+    const sneakGame = {
+      running: false,
+      raf: null,
+      last: 0,
+      state: null,
+      init() { this.reset(); },
+      reset() {
+        this.state = {
+          player: { x: 72, y: 518, w: 28, h: 32, speed: 200 },
+          items: [
+            { id: 'ipad', emoji: '📱', x: 160, y: 100, w: 38, h: 38, collected: false },
+            { id: 'juice', emoji: '🧃', x: 440, y: 470, w: 38, h: 38, collected: false },
+            { id: 'cupcake', emoji: '🧁', x: 740, y: 165, w: 38, h: 38, collected: false }
+          ],
+          bed: { x: 730, y: 500, w: 125, h: 78 },
+          parents: [
+            { x: 190, y: 230, w: 34, h: 44, dir: 1, speed: 86, axis: 'x', min: 120, max: 340, facing: 'right', cone: 118, spread: 95 },
+            { x: 430, y: 118, w: 34, h: 44, dir: 1, speed: 92, axis: 'x', min: 380, max: 650, facing: 'right', cone: 130, spread: 100 },
+            { x: 610, y: 385, w: 34, h: 44, dir: -1, speed: 82, axis: 'y', min: 285, max: 500, facing: 'up', cone: 118, spread: 95 }
+          ],
+          countdown: 0,
+          ended: false,
+          win: false,
+          flashMessage: 'Sneaky...'
+        };
+        this.hideOverlay();
+        this.updateHud();
+      },
+      start() {
+        this.running = true;
+        this.last = performance.now();
+        if (!this.raf) this.loop(this.last);
+      },
+      stop() { this.running = false; },
+      loop(ts) {
+        const dt = Math.min(0.033, (ts - this.last) / 1000 || 0.016);
+        this.last = ts;
+        if (this.running) this.update(dt);
+        this.draw();
+        this.raf = requestAnimationFrame((t) => this.loop(t));
+      },
+      update(dt) {
+        const st = this.state;
+        if (st.countdown > 0) {
+          st.countdown -= dt;
+          if (st.countdown <= 0) {
+            if (st.win) this.showWin(); else this.fail('😲', 'Busted!', 'Busted! Back to bed!');
+          }
+          return;
+        }
+        if (st.ended) return;
+
+        const p = st.player;
+        let dx = 0, dy = 0;
+        if (keys.has('arrowleft') || keys.has('a')) dx -= 1;
+        if (keys.has('arrowright') || keys.has('d')) dx += 1;
+        if (keys.has('arrowup') || keys.has('w')) dy -= 1;
+        if (keys.has('arrowdown') || keys.has('s')) dy += 1;
+        const len = Math.hypot(dx, dy) || 1;
+        p.x += (dx / len) * p.speed * dt;
+        p.y += (dy / len) * p.speed * dt;
+        p.x = Math.max(30, Math.min(sneakCanvas.width - 30 - p.w, p.x));
+        p.y = Math.max(72, Math.min(sneakCanvas.height - 52 - p.h, p.y));
+
+        st.parents.forEach(parent => {
+          parent[parent.axis] += parent.speed * parent.dir * dt;
+          if (parent[parent.axis] < parent.min) { parent[parent.axis] = parent.min; parent.dir = 1; }
+          if (parent[parent.axis] > parent.max) { parent[parent.axis] = parent.max; parent.dir = -1; }
+          if (parent.axis === 'x') parent.facing = parent.dir === 1 ? 'right' : 'left';
+          if (parent.axis === 'y') parent.facing = parent.dir === 1 ? 'down' : 'up';
+        });
+
+        st.items.forEach(item => {
+          if (!item.collected && rectsOverlap(p, item)) {
+            item.collected = true;
+            st.flashMessage = `Got the ${item.id === 'ipad' ? 'iPad' : item.id === 'juice' ? 'Juice Box' : 'Cupcake'}!`;
+            this.updateHud();
+          }
+        });
+
+        for (const parent of st.parents) {
+          if (this.playerInVision(parent, p)) {
+            st.ended = true;
+            st.win = false;
+            st.countdown = 0.55;
+            sneakStatus.textContent = 'Uh oh!';
+            return;
+          }
+        }
+
+        const allItems = st.items.every(item => item.collected);
+        if (allItems && rectsOverlap(p, st.bed)) {
+          st.ended = true;
+          st.win = true;
+          st.countdown = 0.45;
+        }
+
+        sneakStatus.textContent = allItems ? 'Run to the bed!' : st.flashMessage;
+      },
+      playerInVision(parent, player) {
+        const center = { x: player.x + player.w / 2, y: player.y + player.h / 2 };
+        const cx = parent.x + parent.w / 2;
+        const cy = parent.y + parent.h / 2;
+        let a, b;
+        if (parent.facing === 'right') {
+          a = { x: cx + parent.w / 2, y: cy - parent.spread / 2 };
+          b = { x: cx + parent.w / 2, y: cy + parent.spread / 2 };
+          return pointInTri(center.x, center.y, cx, cy, cx + parent.cone, a.y, cx + parent.cone, b.y);
+        }
+        if (parent.facing === 'left') {
+          return pointInTri(center.x, center.y, cx, cy, cx - parent.cone, cy - parent.spread / 2, cx - parent.cone, cy + parent.spread / 2);
+        }
+        if (parent.facing === 'down') {
+          return pointInTri(center.x, center.y, cx, cy, cx - parent.spread / 2, cy + parent.cone, cx + parent.spread / 2, cy + parent.cone);
+        }
+        return pointInTri(center.x, center.y, cx, cy, cx - parent.spread / 2, cy - parent.cone, cx + parent.spread / 2, cy - parent.cone);
+      },
+      drawRoom() {
+        const w = sneakCanvas.width, h = sneakCanvas.height;
+        sctx.clearRect(0, 0, w, h);
+        
+        // Walls
+        sctx.fillStyle = '#6b93ba'; // Darker wall base
+        sctx.fillRect(0, 0, w, 74);
+        const wallGradient = sctx.createLinearGradient(0, 0, 0, 74);
+        wallGradient.addColorStop(0, '#9ad0ff');
+        wallGradient.addColorStop(1, '#7bb4ea');
+        sctx.fillStyle = wallGradient;
+        sctx.fillRect(0, 0, w, 74);
+        
+        // Wood Floor (Improved)
+        sctx.fillStyle = '#9b6c43';
+        sctx.fillRect(0, 74, w, h - 74);
+        sctx.strokeStyle = '#8a5c36';
+        sctx.lineWidth = 2;
+        for (let i = 74; i < h; i += 35) {
+          sctx.beginPath(); sctx.moveTo(0, i); sctx.lineTo(w, i); sctx.stroke();
+        }
+
+        // Rug Shadow
+        sctx.fillStyle = 'rgba(0,0,0,0.15)';
+        sctx.beginPath();
+        sctx.roundRect(248, 193, 410, 220, 26);
+        sctx.fill();
+
+        // Rug
+        sctx.fillStyle = '#8d67ff';
+        sctx.beginPath();
+        sctx.roundRect(245, 190, 410, 220, 26);
+        sctx.fill();
+        sctx.fillStyle = 'rgba(255,255,255,0.15)';
+        sctx.beginPath();
+        sctx.roundRect(275, 215, 350, 170, 22);
+        sctx.fill();
+
+        // Bed Shadow
+        sctx.fillStyle = 'rgba(0,0,0,0.2)';
+        sctx.beginPath();
+        sctx.roundRect(this.state.bed.x - 5, this.state.bed.y + 5, this.state.bed.w, this.state.bed.h, 16);
+        sctx.fill();
+
+        // Bed
+        sctx.fillStyle = '#fff4d7';
+        sctx.beginPath();
+        sctx.roundRect(this.state.bed.x, this.state.bed.y, this.state.bed.w, this.state.bed.h, 16);
+        sctx.fill();
+        sctx.fillStyle = '#ffd3ea';
+        sctx.beginPath();
+        sctx.roundRect(this.state.bed.x + 8, this.state.bed.y + 10, 44, 26, 12);
+        sctx.roundRect(this.state.bed.x + 56, this.state.bed.y + 10, 44, 26, 12);
+        sctx.fill();
+        sctx.fillStyle = '#fff';
+        sctx.font = '800 18px Nunito';
+        sctx.fillText('SAFE ZONE', this.state.bed.x + 14, this.state.bed.y + this.state.bed.h + 24);
+
+        // Desk
+        sctx.fillStyle = 'rgba(0,0,0,0.2)';
+        sctx.beginPath(); sctx.roundRect(45, 99, 120, 84, 18); sctx.fill();
+        sctx.fillStyle = '#fff';
+        sctx.beginPath(); sctx.roundRect(48, 96, 120, 84, 18); sctx.fill();
+        sctx.fillStyle = '#ffd15b';
+        sctx.beginPath(); sctx.arc(108, 138, 24, 0, Math.PI * 2); sctx.fill();
+        sctx.fillStyle = '#ffe97a';
+        sctx.fillRect(102, 130, 12, 38);
+
+        // TV Stand
+        sctx.fillStyle = 'rgba(0,0,0,0.2)';
+        sctx.beginPath(); sctx.roundRect(693, 85, 124, 72, 16); sctx.fill();
+        sctx.fillStyle = '#f9b8d0';
+        sctx.beginPath(); sctx.roundRect(696, 82, 124, 72, 16); sctx.fill();
+        sctx.fillStyle = '#7c5ce6';
+        sctx.fillRect(704, 92, 108, 48);
+        sctx.fillStyle = '#fff';
+        sctx.font = '700 20px Nunito';
+        sctx.fillText('TV', 748, 124);
+      },
+      drawVision(parent) {
+        const cx = parent.x + parent.w / 2;
+        const cy = parent.y + parent.h / 2;
+        
+        // Gradient Vision Cone
+        const grad = sctx.createRadialGradient(cx, cy, 10, cx, cy, parent.cone);
+        grad.addColorStop(0, 'rgba(255, 235, 100, 0.45)');
+        grad.addColorStop(1, 'rgba(255, 235, 100, 0.0)');
+
+        sctx.fillStyle = grad;
+        sctx.beginPath();
+        sctx.moveTo(cx, cy);
+        if (parent.facing === 'right') {
+          sctx.lineTo(cx + parent.cone, cy - parent.spread / 2);
+          sctx.lineTo(cx + parent.cone, cy + parent.spread / 2);
+        } else if (parent.facing === 'left') {
+          sctx.lineTo(cx - parent.cone, cy - parent.spread / 2);
+          sctx.lineTo(cx - parent.cone, cy + parent.spread / 2);
+        } else if (parent.facing === 'down') {
+          sctx.lineTo(cx - parent.spread / 2, cy + parent.cone);
+          sctx.lineTo(cx + parent.spread / 2, cy + parent.cone);
+        } else {
+          sctx.lineTo(cx - parent.spread / 2, cy - parent.cone);
+          sctx.lineTo(cx + parent.spread / 2, cy - parent.cone);
+        }
+        sctx.closePath();
+        sctx.fill();
+      },
+      drawParent(parent) {
+        this.drawVision(parent);
+        
+        // Shadow
+        sctx.fillStyle = 'rgba(0,0,0,0.3)';
+        sctx.beginPath(); sctx.ellipse(parent.x + parent.w/2, parent.y + parent.h, parent.w/1.5, 6, 0, 0, Math.PI * 2); sctx.fill();
+
+        // Body
+        sctx.fillStyle = '#6f4a37';
+        sctx.beginPath();
+        sctx.roundRect(parent.x, parent.y + 10, parent.w, parent.h - 10, 10);
+        sctx.fill();
+        
+        // Head (African American Skin Tone)
+        sctx.fillStyle = '#754b29'; 
+        sctx.beginPath();
+        sctx.arc(parent.x + parent.w / 2, parent.y + 10, 12, 0, Math.PI * 2);
+        sctx.fill();
+
+        // Hair (Dark)
+        sctx.fillStyle = '#1a110a';
+        sctx.beginPath();
+        sctx.arc(parent.x + parent.w / 2, parent.y + 7, 12, Math.PI, Math.PI * 2);
+        sctx.fill();
+
+        sctx.fillStyle = '#fff';
+        sctx.font = '800 13px Nunito';
+        sctx.fillText('Parent', parent.x - 6, parent.y - 10);
+      },
+      drawPlayer() {
+        const p = this.state.player;
+        
+        // Shadow
+        sctx.fillStyle = 'rgba(0,0,0,0.3)';
+        sctx.beginPath(); sctx.ellipse(p.x + p.w/2, p.y + p.h, p.w/1.5, 6, 0, 0, Math.PI * 2); sctx.fill();
+
+        // Body (Matching the blue outfit from the prompt image)
+        sctx.fillStyle = '#1e3a8a';
+        sctx.beginPath();
+        sctx.roundRect(p.x, p.y + 10, p.w, p.h - 10, 8);
+        sctx.fill();
+
+        // Draw Custom Avatar Face
+        const radius = 14;
+        const cx = p.x + p.w / 2;
+        const cy = p.y + 9;
+
+        sctx.save();
+        sctx.beginPath();
+        sctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        sctx.closePath();
+        sctx.clip();
+
+        if (tylerImg.complete && tylerImg.naturalWidth > 0) {
+          // Frame the top part of the image where her face is
+          const sSize = tylerImg.width;
+          const sYOffset = tylerImg.height * 0.08; 
+          sctx.drawImage(tylerImg, 0, sYOffset, sSize, sSize, cx - radius, cy - radius, radius * 2, radius * 2);
+        } else {
+          // Fallback
+          sctx.fillStyle = '#754b29';
+          sctx.fill();
+          sctx.fillStyle = '#1a110a';
+          sctx.beginPath();
+          sctx.arc(cx, cy - 3, radius, Math.PI, Math.PI * 2);
+          sctx.fill();
+        }
+        sctx.restore();
+
+        sctx.fillStyle = '#fff';
+        sctx.font = '800 14px Nunito';
+        sctx.fillText('Tyler', p.x - 2, p.y - 12);
+      },
+      drawItems() {
+        this.state.items.forEach(item => {
+          if (item.collected) return;
+          sctx.fillStyle = 'rgba(0,0,0,0.15)';
+          sctx.beginPath(); sctx.roundRect(item.x - 8, item.y - 4, 48, 48, 12); sctx.fill();
+          
+          sctx.fillStyle = '#fff';
+          sctx.beginPath(); sctx.roundRect(item.x - 10, item.y - 6, 48, 48, 12); sctx.fill();
+          
+          sctx.font = '28px serif';
+          sctx.fillText(item.emoji, item.x - 1, item.y + 28);
+          
+          sctx.strokeStyle = 'rgba(135,87,255,0.4)';
+          sctx.lineWidth = 2;
+          sctx.beginPath();
+          sctx.roundRect(item.x - 10, item.y - 6, 48, 48, 12);
+          sctx.stroke();
+        });
+      },
+      draw() {
+        this.drawRoom();
+        this.state.parents.forEach(parent => this.drawParent(parent));
+        this.drawItems();
+        this.drawPlayer();
+        if (this.state.countdown > 0 && !this.state.win) {
+          sctx.fillStyle = 'rgba(255,90,90,0.18)';
+          sctx.fillRect(0, 0, sneakCanvas.width, sneakCanvas.height);
+        }
+      },
+      updateHud() {
+        const collected = this.state.items.filter(i => i.collected).length;
+        sneakCollected.textContent = `${collected} / 3`;
+        document.getElementById('pill-ipad').classList.toggle('done', this.state.items[0].collected);
+        document.getElementById('pill-juice').classList.toggle('done', this.state.items[1].collected);
+        document.getElementById('pill-cupcake').classList.toggle('done', this.state.items[2].collected);
+      },
+      fail(emoji, title, text) {
+        document.getElementById('sneakOverlayEmoji').textContent = emoji;
+        document.getElementById('sneakOverlayTitle').textContent = title;
+        document.getElementById('sneakOverlayText').textContent = text;
+        sneakOverlay.classList.add('show');
+      },
+      showWin() {
+        document.getElementById('sneakOverlayEmoji').textContent = '🎉';
+        document.getElementById('sneakOverlayTitle').textContent = 'Happy 8th Birthday, Tyler!';
+        document.getElementById('sneakOverlayText').textContent = 'You grabbed all 3 treats and made it safely back to bed!';
+        spawnConfetti(document.getElementById('sneakConfetti'), 110);
+        sneakOverlay.classList.add('show');
+        sneakStatus.textContent = 'Birthday victory!';
+      },
+      hideOverlay() {
+        sneakOverlay.classList.remove('show');
+        document.getElementById('sneakConfetti').innerHTML = '';
+      }
+    };
+
+    document.getElementById('sneakRestartBtn').addEventListener('click', () => sneakGame.reset());
+    document.getElementById('sneakResetTop').addEventListener('click', () => sneakGame.reset());
+    document.getElementById('sneakOverlayRestart').addEventListener('click', () => sneakGame.reset());
+    document.getElementById('sneakMenuTop').addEventListener('click', () => showScreen('menu'));
+    document.getElementById('sneakOverlayMenu').addEventListener('click', () => showScreen('menu'));
+
+    const soccerCanvas = document.getElementById('soccerCanvas');
+    const gctx = soccerCanvas.getContext('2d');
+    const soccerOverlay = document.getElementById('soccerOverlay');
+
+    const soccerGame = {
+      running: false,
+      raf: null,
+      last: 0,
+      flashTimer: 0,
+      mouseX: null,
+      state: null,
+      init() {
+        this.reset();
+        soccerCanvas.addEventListener('mousemove', (e) => {
+          const rect = soccerCanvas.getBoundingClientRect();
+          const scaleX = soccerCanvas.width / rect.width;
+          this.mouseX = (e.clientX - rect.left) * scaleX;
+        });
+        soccerCanvas.addEventListener('click', () => this.shoot());
+      },
+      reset() {
+        this.state = {
+          playerX: soccerCanvas.width / 2,
+          ball: { x: soccerCanvas.width / 2, y: soccerCanvas.height - 78, r: 18, vx: 0, vy: 0, active: false, rot: 0 },
+          goalie: { x: 360, y: 126, w: 170, h: 26, dir: 1, speed: 220 },
+          goals: 0,
+          shots: 0,
+          ended: false,
+          flash: '',
+          win: false,
+          net: { x: 190, y: 78, w: 520, h: 118 }
+        };
+        this.hideOverlay();
+        this.updateHud('Line up your shot!');
+      },
+      start() {
+        this.running = true;
+        this.last = performance.now();
+        if (!this.raf) this.loop(this.last);
+      },
+      stop() { this.running = false; },
+      loop(ts) {
+        const dt = Math.min(0.033, (ts - this.last) / 1000 || 0.016);
+        this.last = ts;
+        if (this.running) this.update(dt);
+        this.draw();
+        this.raf = requestAnimationFrame((t) => this.loop(t));
+      },
+      update(dt) {
+        const st = this.state;
+        if (st.ended) return;
+
+        let move = 0;
+        if (this.mouseX !== null) {
+          st.playerX += (this.mouseX - st.playerX) * Math.min(1, dt * 10);
+        } else {
+          if (keys.has('arrowleft') || keys.has('a')) move -= 1;
+          if (keys.has('arrowright') || keys.has('d')) move += 1;
+          st.playerX += move * 300 * dt;
+        }
+        st.playerX = Math.max(80, Math.min(soccerCanvas.width - 80, st.playerX));
+        
+        if (!st.ball.active) {
+          st.ball.x = st.playerX;
+          st.ball.y = soccerCanvas.height - 76;
+        } else {
+          st.ball.rot += dt * 15; // Rotate ball when moving
+        }
+
+        st.goalie.x += st.goalie.speed * st.goalie.dir * dt;
+        if (st.goalie.x <= st.net.x + 14) { st.goalie.x = st.net.x + 14; st.goalie.dir = 1; }
+        if (st.goalie.x + st.goalie.w >= st.net.x + st.net.w - 14) { st.goalie.x = st.net.x + st.net.w - 14 - st.goalie.w; st.goalie.dir = -1; }
+
+        if (st.ball.active) {
+          st.ball.x += st.ball.vx * dt;
+          st.ball.y += st.ball.vy * dt;
+          if (st.ball.x - st.ball.r < 0 || st.ball.x + st.ball.r > soccerCanvas.width) st.ball.vx *= -1;
+
+          const goalieRect = { x: st.goalie.x, y: st.goalie.y, w: st.goalie.w, h: st.goalie.h + 40 };
+          const ballRect = { x: st.ball.x - st.ball.r, y: st.ball.y - st.ball.r, w: st.ball.r * 2, h: st.ball.r * 2 };
+          if (rectsOverlap(ballRect, goalieRect)) {
+            this.resetBall('Saved by the goalie!');
+            return;
+          }
+
+          if (st.ball.y - st.ball.r <= st.net.y + st.net.h && st.ball.x > st.net.x && st.ball.x < st.net.x + st.net.w) {
+            st.goals += 1;
+            if (st.goals >= 5) {
+              st.ended = true;
+              st.win = true;
+              this.updateHud('Birthday superstar!');
+              this.showWin();
+            } else {
+              this.resetBall('GOAL! Amazing shot!');
+            }
+            return;
+          }
+
+          if (st.ball.y + st.ball.r < 0) {
+            this.resetBall('Missed! Try again!');
+          }
+        }
+
+        if (this.flashTimer > 0) this.flashTimer -= dt;
+        this.updateHud(st.flash || 'Line up your shot!');
+      },
+      shoot() {
+        const st = this.state;
+        if (!screens.soccer.classList.contains('active') || st.ended || st.ball.active) return;
+        st.shots += 1;
+        st.ball.active = true;
+        const targetX = st.playerX;
+        const offset = (targetX - soccerCanvas.width / 2) * 0.8;
+        st.ball.vx = offset * 0.8;
+        st.ball.vy = -440;
+        st.flash = 'Shot away!';
+        this.flashTimer = 0.4;
+        this.updateHud(st.flash);
+      },
+      resetBall(message) {
+        const st = this.state;
+        st.ball.active = false;
+        st.flash = message;
+        this.flashTimer = 1;
+      },
+      updateHud(status) {
+        document.getElementById('soccerGoals').textContent = `${this.state.goals} / 5`;
+        document.getElementById('soccerShots').textContent = `${this.state.shots}`;
+        document.getElementById('soccerStatus').textContent = status;
+      },
+      drawField() {
+        const w = soccerCanvas.width, h = soccerCanvas.height;
+        gctx.clearRect(0, 0, w, h);
+        const sky = gctx.createLinearGradient(0, 0, 0, 100);
+        sky.addColorStop(0, '#8ed8ff');
+        sky.addColorStop(1, '#dbf6ff');
+        gctx.fillStyle = sky;
+        gctx.fillRect(0, 0, w, 100);
+
+        // Striped Field
+        for (let i = 100; i < h; i += 40) {
+          gctx.fillStyle = (i / 40) % 2 === 0 ? '#5ebf4b' : '#52ad40';
+          gctx.fillRect(0, i, w, 40);
+        }
+
+        const net = this.state.net;
+        
+        // Net Background
+        gctx.fillStyle = 'rgba(255,255,255,0.15)';
+        gctx.fillRect(net.x, net.y, net.w, net.h);
+
+        // Net Lines
+        gctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        gctx.lineWidth = 2;
+        for (let i = 0; i <= 16; i++) {
+          const x = net.x + (i / 16) * net.w;
+          gctx.beginPath(); gctx.moveTo(x, net.y); gctx.lineTo(x, net.y + net.h); gctx.stroke();
+        }
+        for (let i = 0; i <= 5; i++) {
+          const y = net.y + (i / 5) * net.h;
+          gctx.beginPath(); gctx.moveTo(net.x, y); gctx.lineTo(net.x + net.w, y); gctx.stroke();
+        }
+
+        // Goal Posts
+        gctx.fillStyle = '#f0f0f0';
+        gctx.fillRect(net.x - 8, net.y - 8, net.w + 16, 12); // Top crossbar
+        gctx.fillRect(net.x - 8, net.y - 8, 12, net.h + 16); // Left post
+        gctx.fillRect(net.x + net.w - 4, net.y - 8, 12, net.h + 16); // Right post
+
+        // Penalty Box Arcs
+        gctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        gctx.lineWidth = 4;
+        gctx.beginPath();
+        gctx.arc(w / 2, h - 30, 140, Math.PI, 2 * Math.PI);
+        gctx.stroke();
+      },
+      drawGoalie() {
+        const g = this.state.goalie;
+        
+        // Goalie Shadow
+        gctx.fillStyle = 'rgba(0,0,0,0.3)';
+        gctx.beginPath(); gctx.ellipse(g.x + g.w/2, g.y + 44 + 8, g.w/2, 10, 0, 0, Math.PI * 2); gctx.fill();
+
+        // Body
+        gctx.fillStyle = '#e63946'; // Red jersey
+        gctx.beginPath();
+        gctx.roundRect(g.x, g.y + 18, g.w, 44, 20);
+        gctx.fill();
+        
+        // Head (African American Skin Tone)
+        gctx.fillStyle = '#754b29';
+        gctx.beginPath();
+        gctx.arc(g.x + g.w / 2, g.y + 12, 18, 0, Math.PI * 2);
+        gctx.fill();
+
+        // Hair
+        gctx.fillStyle = '#1a110a';
+        gctx.beginPath();
+        gctx.arc(g.x + g.w / 2, g.y + 8, 18, Math.PI, 2 * Math.PI);
+        gctx.fill();
+
+        gctx.fillStyle = '#fff';
+        gctx.font = '800 16px Nunito';
+        gctx.fillText('Goalie', g.x + g.w / 2 - 24, g.y + 85);
+      },
+      drawPlayer() {
+        const x = this.state.playerX;
+        const y = soccerCanvas.height - 52;
+        
+        // Shadow
+        gctx.fillStyle = 'rgba(0,0,0,0.4)';
+        gctx.beginPath(); gctx.ellipse(x, y + 10, 24, 6, 0, 0, Math.PI * 2); gctx.fill();
+
+        // Body
+        gctx.fillStyle = '#1e3a8a';
+        gctx.beginPath();
+        gctx.roundRect(x - 26, y - 18, 52, 26, 12);
+        gctx.fill();
+        
+        // Custom Avatar Face
+        const radius = 18;
+        const cy = y - 30;
+
+        gctx.save();
+        gctx.beginPath();
+        gctx.arc(x, cy, radius, 0, Math.PI * 2);
+        gctx.closePath();
+        gctx.clip();
+
+        if (tylerImg.complete && tylerImg.naturalWidth > 0) {
+          const sSize = tylerImg.width;
+          const sYOffset = tylerImg.height * 0.08; 
+          gctx.drawImage(tylerImg, 0, sYOffset, sSize, sSize, x - radius, cy - radius, radius * 2, radius * 2);
+        } else {
+          gctx.fillStyle = '#754b29';
+          gctx.fill();
+          gctx.fillStyle = '#1a110a';
+          gctx.beginPath();
+          gctx.arc(x, cy - 4, radius, Math.PI, Math.PI * 2);
+          gctx.fill();
+        }
+        gctx.restore();
+
+        gctx.fillStyle = '#ffffff';
+        gctx.font = '800 16px Nunito';
+        gctx.fillText('Tyler', x - 18, y + 32);
+      },
+      drawBall() {
+        const b = this.state.ball;
+        gctx.save();
+        gctx.translate(b.x, b.y);
+        
+        // Ball Shadow
+        if (b.active) {
+            gctx.fillStyle = 'rgba(0,0,0,0.2)';
+            gctx.beginPath(); gctx.ellipse(0, 40, b.r*0.8, b.r*0.3, 0, 0, Math.PI * 2); gctx.fill();
+        }
+
+        gctx.rotate(b.rot);
+        
+        // 3D Gradient Ball
+        const ballGrad = gctx.createRadialGradient(-b.r*0.3, -b.r*0.3, b.r*0.1, 0, 0, b.r);
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.8, '#cccccc');
+        ballGrad.addColorStop(1, '#888888');
+        
+        gctx.fillStyle = ballGrad;
+        gctx.beginPath();
+        gctx.arc(0, 0, b.r, 0, Math.PI * 2);
+        gctx.fill();
+        
+        gctx.strokeStyle = '#2f2744';
+        gctx.lineWidth = 2;
+        gctx.stroke();
+        
+        // Pentagon Patterns
+        for (let i = 0; i < 5; i++) {
+          const angle = (Math.PI * 2 / 5) * i;
+          gctx.beginPath();
+          gctx.moveTo(Math.cos(angle)*4, Math.sin(angle)*4);
+          gctx.lineTo(Math.cos(angle) * 14, Math.sin(angle) * 14);
+          gctx.stroke();
+        }
+        gctx.fillStyle = '#2f2744';
+        gctx.beginPath(); gctx.arc(0,0, 4, 0, Math.PI*2); gctx.fill();
+
+        gctx.restore();
+      },
+      drawAimArrow() {
+        if (this.state.ball.active || this.state.ended) return;
+        const x = this.state.playerX;
+        const y = soccerCanvas.height - 116;
+        
+        gctx.strokeStyle = 'rgba(255, 235, 100, 0.8)';
+        gctx.lineWidth = 5;
+        gctx.setLineDash([8, 8]);
+        gctx.beginPath();
+        gctx.moveTo(x, y + 30);
+        gctx.lineTo(x, y - 28);
+        gctx.stroke();
+        gctx.setLineDash([]);
+        
+        gctx.beginPath();
+        gctx.moveTo(x, y - 28);
+        gctx.lineTo(x - 12, y - 8);
+        gctx.lineTo(x + 12, y - 8);
+        gctx.closePath();
+        gctx.fillStyle = 'rgba(255, 235, 100, 0.8)';
+        gctx.fill();
+      },
+      draw() {
+        this.drawField();
+        this.drawGoalie();
+        this.drawAimArrow();
+        this.drawPlayer();
+        this.drawBall();
+      },
+      showWin() {
+        document.getElementById('soccerOverlayEmoji').textContent = '🥳';
+        document.getElementById('soccerOverlayTitle').textContent = 'GOAL! Happy 8th Birthday, Tyler!';
+        document.getElementById('soccerOverlayText').textContent = 'You scored 5 goals and won the birthday match!';
+        spawnConfetti(document.getElementById('soccerConfetti'), 120);
+        soccerOverlay.classList.add('show');
+      },
+      hideOverlay() {
+        soccerOverlay.classList.remove('show');
+        document.getElementById('soccerConfetti').innerHTML = '';
+      }
+    };
+
+    document.getElementById('soccerRestartBtn').addEventListener('click', () => soccerGame.reset());
+    document.getElementById('soccerResetTop').addEventListener('click', () => soccerGame.reset());
+    document.getElementById('soccerOverlayRestart').addEventListener('click', () => soccerGame.reset());
+    document.getElementById('soccerMenuTop').addEventListener('click', () => showScreen('menu'));
+    document.getElementById('soccerOverlayMenu').addEventListener('click', () => showScreen('menu'));
+
+    sneakGame.init();
+    soccerGame.init();
+  </script>
+</body>
+</html>
