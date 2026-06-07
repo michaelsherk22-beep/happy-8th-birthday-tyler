@@ -47,23 +47,25 @@
 
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; min-height: 100%; }
-    body {
-      font-family: var(--font-body);
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, #ffffff 0%, rgba(255,255,255,0.65) 24%, transparent 25%),
-        radial-gradient(circle at bottom right, #ffffff 0%, rgba(255,255,255,0.55) 18%, transparent 19%),
-        linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-      overflow: hidden;
-    }
+  body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, #ffffff 0%, rgba(255,255,255,0.65) 24%, transparent 25%),
+    radial-gradient(circle at bottom right, #ffffff 0%, rgba(255,255,255,0.55) 18%, transparent 19%),
+    linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+  /* allow vertical scrolling on phones */
+}
     button { font: inherit; }
     .app {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  /* allow scrolling on small screens */
+  overflow: auto;
+}
     .screen {
       width: min(1100px, 100%);
       display: none;
@@ -290,6 +292,60 @@
       .title { font-size: clamp(2.2rem, 8vw, 3.2rem); }
       canvas { height: 52vh; }
     }
+    @media (max-width: 920px) {
+  .hero,
+  .game-wrap,
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+
+  .canvas-wrap {
+    order: 1;
+  }
+
+  canvas {
+    height: 60vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .toolbar {
+    width: 100%;
+  }
+
+  .toolbar .btn {
+    flex: 1 1 140px;
+  }
+
+  .hero-card,
+  .menu-card,
+  .hud,
+  .howto,
+  .overlay-card {
+    padding: var(--space-4);
+  }
+
+  .title {
+    font-size: clamp(2rem, 7vw, 3rem);
+  }
+
+  canvas {
+    height: 52vh;
+  }
+}
   </style>
 </head>
 <body>
