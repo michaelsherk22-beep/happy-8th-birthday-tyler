@@ -278,6 +278,43 @@
     @keyframes confetti-fall {
       to { transform: translateY(110vh) rotate(700deg); opacity: 0.95; }
     }
+    .mobile-controls {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mc-row {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mc-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(180deg, #ffffff, #f3e9ff);
+  box-shadow: 0 4px 10px rgba(40, 25, 75, 0.18);
+  font-size: 22px;
+  font-weight: 800;
+  color: #5a3e99;
+  cursor: pointer;
+}
+
+.mc-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 5px rgba(40, 25, 75, 0.24);
+}
+
+@media (min-width: 900px) {
+  /* hide touch controls on larger screens (keyboard users) */
+  .mobile-controls {
+    display: none;
+  }
+}
 
     @media (max-width: 920px) {
   canvas {
@@ -422,6 +459,16 @@
                 <div class="button-row">
                   <button class="btn btn-primary" id="sneakRestartBtn">Restart Level</button>
                 </div>
+                  <!-- NEW: mobile control pad -->
+  <div class="mobile-controls" id="sneakTouchControls">
+    <button class="mc-btn mc-up" data-dir="up">▲</button>
+    <div class="mc-row">
+      <button class="mc-btn" data-dir="left">◀</button>
+      <button class="mc-btn" data-dir="down">▼</button>
+      <button class="mc-btn" data-dir="right">▶</button>
+    </div>
+  </div>
+</section>
               </section>
             </aside>
             <div class="canvas-wrap">
@@ -511,6 +558,14 @@
     document.getElementById('playSoccerBtn').addEventListener('click', () => showScreen('soccer'));
 
     const keys = new Set();
+    // NEW: virtual key helpers for touch buttons
+function pressVirtualKey(name) {
+  keys.add(name);
+}
+
+function releaseVirtualKey(name) {
+  keys.delete(name);
+}
     window.addEventListener('keydown', (e) => {
       const lower = e.key.toLowerCase();
       if (["arrowup","arrowdown","arrowleft","arrowright"," ","w","a","s","d"].includes(lower) || e.key === ' ') {
@@ -1261,6 +1316,38 @@
 
     sneakGame.init();
     soccerGame.init();
+    // Attach touch controls for Sneak game
+const sneakTouchControls = document.getElementById('sneakTouchControls');
+if (sneakTouchControls) {
+  sneakTouchControls.querySelectorAll('.mc-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+    const keyName =
+      dir === 'up' ? 'arrowup' :
+      dir === 'down' ? 'arrowdown' :
+      dir === 'left' ? 'arrowleft' :
+      'arrowright';
+
+    // For touch devices
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      pressVirtualKey(keyName);
+    }, { passive: false });
+
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      releaseVirtualKey(keyName);
+    }, { passive: false });
+
+    // Also support mouse (for testing)
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      pressVirtualKey(keyName);
+    });
+    window.addEventListener('mouseup', () => {
+      releaseVirtualKey(keyName);
+    });
+  });
+}
   </script>
 </body>
 </html>
